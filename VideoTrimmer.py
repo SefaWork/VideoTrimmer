@@ -1,21 +1,16 @@
 import sys
 import subprocess
 
-print(sys.argv)
-
 args = sys.argv
 del args[0]
 
 if len(args) == 0:
-    print("No arguments were provided.")
-    return
+    sys.exit("No arguments were provided.")
 
 try:
     result = subprocess.run(["ffmpeg", "-version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    print(result.stdout)
 except FileNotFoundError:
-    print("FFMPEG is not installed.")
-    return
+    sys.exit("FFMPEG is not installed.")
 
 i = 1
 for filePath in args:
@@ -30,10 +25,9 @@ for filePath in args:
 
     if givenSaveName != "":
         saveName = givenSaveName
-
-    print(saveName)
     
     try:
+        print("Processing file...")
         result = subprocess.run([
             "ffmpeg",
             "-ss", startTime,
@@ -41,10 +35,10 @@ for filePath in args:
             "-c", "copy",
             "-t", duration,
             saveName
-        ])
-        print(result.stdout)
+        ], stdout = subprocess.PIPE, stderr = subprocess.PIPE, text=True)
+        print("Done processing.")
     except subprocess.CalledProcessError as e:
-        print("Failure.")
+        print("Failed to process file.")
 
     i = i + 1
 
